@@ -1,0 +1,59 @@
+Fs=256;
+%J=0;
+for i=11:13
+    [datao,datah] = edfread(sprintf('chb12_%g.edf',i));
+    datah=datah';
+    temp=zeros(size(datah,1),18);
+    temp(:,1)=datah(:,5)-datah(:,1);
+    temp(:,2)=datah(:,1)-datah(:,2);
+    temp(:,3)=datah(:,2)-datah(:,3);
+    temp(:,4)=datah(:,3)-datah(:,9);
+    temp(:,5)=datah(:,5)-datah(:,6);
+    temp(:,6)=datah(:,6)-datah(:,7);
+    temp(:,7)=datah(:,7)-datah(:,8);
+    temp(:,8)=datah(:,8)-datah(:,9);
+    temp(:,9)=datah(:,15)-datah(:,16);
+    temp(:,10)=datah(:,16)-datah(:,17);
+    temp(:,11)=datah(:,17)-datah(:,18);
+    temp(:,12)=datah(:,18)-datah(:,19);
+    temp(:,13)=datah(:,15)-datah(:,21);
+    temp(:,14)=datah(:,21)-datah(:,22);
+    temp(:,15)=datah(:,22)-datah(:,23);
+    temp(:,16)=datah(:,23)-datah(:,19);
+    temp(:,17)=datah(:,11)-datah(:,12);
+    temp(:,18)=datah(:,12)-datah(:,13);
+    N=size(temp,1);
+    F=size(temp,2);
+    G=(N/256);
+    M=N*F/256;
+    vals=zeros(256,M);
+    for k=1:G
+        j=1:F;
+        vals(:,G*(j-1)+k)=temp(1+256*(k-1):256*(k),j);
+    end
+    t=1:M;
+    Pxx = abs(fftshift(fft(vals(:,t),256))).^2;
+    Pxx = 2*Pxx(129:256,:);
+    for l=1:M
+               %final_data(J+mod(l-1,G)+1,8*(floor((l-1)./G))+1)=sum(Pxx(2:4,l));
+               %final_data(J+mod(l-1,G)+1,8*(floor((l-1)./G))+2)=sum(Pxx(5:7,l));
+               %final_data(J+mod(l-1,G)+1,8*(floor((l-1)./G))+3)=sum(Pxx(8:10,l));
+               %final_data(J+mod(l-1,G)+1,8*(floor((l-1)./G))+4)=sum(Pxx(11:13,l));
+               %final_data(J+mod(l-1,G)+1,8*(floor((l-1)./G))+5)=sum(Pxx(14:16,l));
+               %final_data(J+mod(l-1,G)+1,8*(floor((l-1)./G))+6)=sum(Pxx(17:19,l));
+               %final_data(J+mod(l-1,G)+1,8*(floor((l-1)./G))+7)=sum(Pxx(20:22,l));
+               %final_data(J+mod(l-1,G)+1,8*(floor((l-1)./G))+8)=sum(Pxx(23:26,l));
+               %final_data(J+mod(l-1,G)+1,(floor((l-1)./G))+1)=entrop(vals(:,l));
+               %final_data(J+mod(l-1,G)+1,(floor((l-1)./G))+1)=petropy(vals(:,l),7,1,'order');
+               final_data(J+mod(l-1,G)+1,7*(floor((l-1)./G))+1)=entrop(Pxx(:,l));
+               final_data(J+mod(l-1,G)+1,7*(floor((l-1)./G))+2)=checkfornan(skewness(vals(:,l)));
+               final_data(J+mod(l-1,G)+1,7*(floor((l-1)./G))+3)=checkfornan(kurtosis(vals(:,l)));
+               final_data(J+mod(l-1,G)+1,7*(floor((l-1)./G))+4)=var(vals(:,l));
+               final_data(J+mod(l-1,G)+1,7*(floor((l-1)./G))+5)=complexity(vals(:,l));
+               final_data(J+mod(l-1,G)+1,7*(floor((l-1)./G))+6)=mobility(vals(:,l));
+               final_data(J+mod(l-1,G)+1,7*(floor((l-1)./G))+7)=rms(vals(:,l));
+    end
+    i
+    J=size(final_data,1);
+end
+
